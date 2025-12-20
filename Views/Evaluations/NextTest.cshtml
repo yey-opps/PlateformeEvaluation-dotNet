@@ -1,0 +1,23 @@
+@model WebApplication1.Models.PasserEvaluationViewModel
+
+@{
+    var evalId = Model.EvaluationId;
+}
+<div class="container text-center mt-5">
+
+    <h2 class="fw-bold mb-4">Bravo ! Vous avez terminé ce test.</h2>
+
+    <p class="lead mb-4">
+        Vous pouvez maintenant passer au prochain test.
+    </p>
+    
+    <a href="/Evaluations/PasserEvaluation/@(evalId + 1)" class="btn btn-success btn-lg">
+        Passer au test suivant
+    </a>
+
+
+    <div class="mt-4 text-muted">
+        Test précédent : @Model.EvaluationId  
+    </div>
+
+</div>

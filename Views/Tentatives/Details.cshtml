@@ -1,0 +1,107 @@
+@model WebApplication1.Models.Tentative
+
+@{
+    ViewData["Title"] = "Détails de la tentative";
+    Layout = "_LayoutDashboard";
+}
+
+<!-- En-tête -->
+<div class="page-header mb-4 d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="page-title">Détails de la tentative</h1>
+        <p class="page-subtitle">
+            Résultat détaillé d’une tentative d’évaluation.
+        </p>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="btn btn-light">
+            ← Retour
+        </a>
+    </div>
+</div>
+
+<!-- Carte principale -->
+<div class="card mb-4">
+    <div class="card-body">
+
+        <div class="row">
+            <!-- Infos générales -->
+            <div class="col-md-6">
+                <h5 class="card-title mb-3">📄 Informations générales</h5>
+
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Date de passage</dt>
+                    <dd class="col-sm-8">
+                        @Model.DatePassage.ToString("dd/MM/yyyy HH:mm")
+                    </dd>
+
+                    <dt class="col-sm-4">Évaluation</dt>
+                    <dd class="col-sm-8">
+                        @Model.Evaluation?.Titre
+                    </dd>
+
+                    <dt class="col-sm-4">Candidat</dt>
+                    <dd class="col-sm-8">
+                        @Model.Candidat?.Prenom @Model.Candidat?.Nom
+                    </dd>
+                </dl>
+            </div>
+
+            <!-- Résultat -->
+            <div class="col-md-6">
+                <h5 class="card-title mb-3">🎯 Résultat</h5>
+
+                @{
+                    var score = Model.Score;
+                    var status = score >= 75 ? "Réussi" :
+                                 score >= 50 ? "Passable" :
+                                 score > 0 ? "Insuffisant" : "Non complété";
+
+                    var badge = score >= 75 ? "bg-success" :
+                                score >= 50 ? "bg-warning" :
+                                score > 0 ? "bg-danger" : "bg-secondary";
+                }
+
+                <div class="mb-3">
+                    <span class="badge @badge fs-6">
+                        @status
+                    </span>
+                </div>
+
+                <div class="mb-2">
+                    <strong>Score :</strong>
+                </div>
+
+                <div class="progress mb-2" style="height: 22px;">
+                    <div class="progress-bar @badge"
+                         role="progressbar"
+                         style="width: @score%">
+                        @score.ToString("0.00")%
+                    </div>
+                </div>
+
+                <small class="text-muted">
+                    Score obtenu lors de cette tentative.
+                </small>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Actions -->
+<div class="d-flex gap-2">
+    <a asp-controller="Candidats"
+       asp-action="Details"
+       asp-route-id="@Model.CandidatId"
+       class="btn btn-outline-primary">
+        👤 Voir le profil du candidat
+    </a>
+</div>
+
+<style>
+    .progress {
+        border-radius: 10px;
+    }
+</style>

@@ -1,0 +1,654 @@
+/* ================================
+   EXEMPLES DE PERSONNALISATION
+   Étendre et adapter le design
+   ================================ */
+
+/* ================================
+   1. COULEURS PERSONNALISÉES
+   ================================ */
+
+/* Exemple 1: Thème Tech Bleu
+:root {
+  --primary: #0891b2;              /* Cyan */
+  --primary-light: #06b6d4;        /* Cyan light */
+  --primary-dark: #0369a1;         /* Cyan dark */
+  --secondary: #3b82f6;            /* Bleu */
+  --accent-cyan: #00d9ff;          /* Cyan vif */
+  --accent-pink: #f472b6;          /* Rose clair */
+  --gradient-main: linear-gradient(135deg, #0891b2 0%, #3b82f6 50%, #f472b6 100%);
+}
+*/
+
+/* Exemple 2: Thème Corporate Gold
+:root {
+  --primary: #d97706;              /* Or */
+  --primary-light: #f59e0b;        /* Or light */
+  --primary-dark: #b45309;         /* Or dark */
+  --secondary: #84cc16;            /* Vert citron */
+  --accent-cyan: #06b6d4;          /* Cyan */
+  --accent-pink: #ec4899;          /* Rose */
+  --gradient-main: linear-gradient(135deg, #d97706 0%, #84cc16 50%, #f59e0b 100%);
+}
+*/
+
+/* Exemple 3: Thème Vibrant Neon
+:root {
+  --primary: #ff006e;              /* Rose neon */
+  --primary-light: #ff1493;        /* Rose light */
+  --primary-dark: #c2185b;         /* Rose dark */
+  --secondary: #00f5ff;            /* Cyan neon */
+  --accent-cyan: #00ffff;          /* Cyan vif */
+  --accent-pink: #ff10f0;          /* Magenta */
+  --gradient-main: linear-gradient(135deg, #ff006e 0%, #00f5ff 50%, #ff10f0 100%);
+}
+*/
+
+/* ================================
+   2. NOUVELLES SECTIONS
+   ================================ */
+
+/* Section avec background image */
+.section-with-image {
+  position: relative;
+  padding: 4rem 2rem;
+  overflow: hidden;
+}
+
+.section-with-image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('path/to/image.jpg') center/cover;
+  opacity: 0.15;
+  z-index: 0;
+}
+
+.section-with-image > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Section Testimonials */
+.testimonials-section {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.03) 100%);
+  padding: 4rem 0;
+  margin: 4rem 0;
+}
+
+.testimonial-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+
+.testimonial-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-xl);
+}
+
+.testimonial-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.testimonial-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--gradient-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.testimonial-info h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.testimonial-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.testimonial-stars {
+  color: #fbbf24;
+  margin-bottom: 0.5rem;
+}
+
+.testimonial-text {
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+/* ================================
+   3. BADGES & TAGS
+   ================================ */
+
+.badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  background: var(--gradient-main);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  animation: slideInDown var(--transition-base);
+}
+
+.badge-outline {
+  background: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+}
+
+.badge-success {
+  background: #10b981;
+  color: white;
+}
+
+.badge-warning {
+  background: #f59e0b;
+  color: white;
+}
+
+.badge-error {
+  background: #ef4444;
+  color: white;
+}
+
+/* ================================
+   4. PROGRESS BARS
+   ================================ */
+
+.progress-bar-custom {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.progress-bar-custom::after {
+  content: '';
+  display: block;
+  height: 100%;
+  background: var(--gradient-main);
+  width: 0%;
+  transition: width var(--transition-slow);
+  border-radius: var(--radius-sm);
+}
+
+.progress-bar-custom.progress-75::after {
+  width: 75%;
+}
+
+.progress-bar-custom.progress-90::after {
+  width: 90%;
+}
+
+/* ================================
+   5. TIMELINE
+   ================================ */
+
+.timeline {
+  position: relative;
+  padding: 2rem 0;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+.timeline-item {
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.timeline-item:nth-child(odd) {
+  margin-left: 0;
+  margin-right: 50%;
+  text-align: right;
+}
+
+.timeline-item:nth-child(even) {
+  margin-left: 50%;
+  margin-right: 0;
+  text-align: left;
+}
+
+.timeline-dot {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: var(--gradient-main);
+  border: 4px solid var(--bg-primary);
+  border-radius: 50%;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  box-shadow: var(--shadow-md);
+}
+
+.timeline-content {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+/* ================================
+   6. MODAL PERSONNALISÉ
+   ================================ */
+
+.modal-custom {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn var(--transition-base);
+}
+
+.modal-custom.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  padding: 2rem;
+  box-shadow: var(--shadow-xl);
+  max-width: 500px;
+  width: 90%;
+  animation: slideInDown var(--transition-base);
+}
+
+.modal-close {
+  float: right;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.modal-close:hover {
+  color: var(--text-primary);
+}
+
+/* ================================
+   7. SLIDERS & CARROUSELS
+   ================================ */
+
+.carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.carousel-item {
+  animation: slideInRight var(--transition-base);
+}
+
+.carousel-item.hidden {
+  display: none;
+}
+
+.carousel-controls {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.carousel-dot.active {
+  background: white;
+  width: 30px;
+  border-radius: 6px;
+}
+
+/* ================================
+   8. FORMULAIRES PERSONNALISÉS
+   ================================ */
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(99, 102, 241, 0.2);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.form-error {
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.form-success {
+  color: #10b981;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+/* ================================
+   9. LOADERS & SPINNERS
+   ================================ */
+
+.spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(99, 102, 241, 0.2);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loader-dot {
+  display: inline-flex;
+  gap: 0.4rem;
+}
+
+.loader-dot span {
+  width: 8px;
+  height: 8px;
+  background: var(--primary);
+  border-radius: 50%;
+  animation: bounce 1.4s infinite;
+}
+
+.loader-dot span:nth-child(1) { animation-delay: 0s; }
+.loader-dot span:nth-child(2) { animation-delay: 0.2s; }
+.loader-dot span:nth-child(3) { animation-delay: 0.4s; }
+
+/* ================================
+   10. BREADCRUMBS
+   ================================ */
+
+.breadcrumb {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumb-item {
+  color: var(--text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.breadcrumb-item:hover {
+  color: var(--primary);
+}
+
+.breadcrumb-item.active {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.breadcrumb-separator {
+  color: var(--text-light);
+  margin: 0 0.25rem;
+}
+
+/* ================================
+   11. TOOLTIPS
+   ================================ */
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text-primary);
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+  z-index: 100;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+/* ================================
+   12. TABLES MODERNES
+   ================================ */
+
+.table-custom {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.table-custom th {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));
+  padding: 1rem;
+  text-align: left;
+  font-weight: 700;
+  border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+}
+
+.table-custom td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+.table-custom tbody tr:hover {
+  background: rgba(99, 102, 241, 0.05);
+}
+
+/* ================================
+   13. ANIMATIONS SUPPLÉMENTAIRES
+   ================================ */
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* ================================
+   14. UTILITAIRES ADDITIONNELS
+   ================================ */
+
+.hidden {
+  display: none !important;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+.blur {
+  filter: blur(5px);
+}
+
+.grayscale {
+  filter: grayscale(100%);
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.opacity-75 {
+  opacity: 0.75;
+}
+
+.max-w-sm {
+  max-width: 384px;
+}
+
+.max-w-md {
+  max-width: 448px;
+}
+
+.max-w-lg {
+  max-width: 512px;
+}
+
+.max-w-xl {
+  max-width: 640px;
+}
+
+/* ================================
+   15. HOVER STATES
+   ================================ */
+
+.interactive-element {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.interactive-element:active {
+  transform: scale(0.98);
+}
+
+.interactive-element:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Mode sombre pour nouveaux composants */
+body.dark-mode {
+  --bg-primary: #1e293b;
+  --text-secondary: #cbd5e1;
+  --text-light: #94a3b8;
+}
+
+body.dark-mode .modal-content,
+body.dark-mode .testimonial-card,
+body.dark-mode .timeline-content {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+body.dark-mode .form-input,
+body.dark-mode .form-textarea {
+  background: rgba(51, 65, 85, 0.5);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: var(--dark-text);
+}
+
+/* ================================
+   FIN DES EXEMPLES DE PERSONNALISATION
+   ================================ */

@@ -1,0 +1,61 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "S'inscrire";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">@ViewData["Title"]</h2>
+                    
+                    <form asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="Input.Nom"></label>
+                            <input asp-for="Input.Nom" class="form-control" autocomplete="family-name" />
+                            <span asp-validation-for="Input.Nom" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="Input.Prenom"></label>
+                            <input asp-for="Input.Prenom" class="form-control" autocomplete="given-name" />
+                            <span asp-validation-for="Input.Prenom" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="Input.Email"></label>
+                            <input asp-for="Input.Email" class="form-control" autocomplete="username" />
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="Input.Password"></label>
+                            <input asp-for="Input.Password" class="form-control" autocomplete="new-password" />
+                            <span asp-validation-for="Input.Password" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="Input.ConfirmPassword"></label>
+                            <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" />
+                            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 mt-3">S'inscrire</button>
+                    </form>
+                    
+                    <div class="mt-3 text-center">
+                        <p>Vous avez déjà un compte? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Se connecter</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

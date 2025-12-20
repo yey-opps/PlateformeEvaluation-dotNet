@@ -1,0 +1,118 @@
+@{
+    ViewData["Title"] = "Résultats de l'évaluation";
+    
+    // ✅ Parse from strings
+    int score = 0;
+    int total = 0;
+    double percentage = 0;
+    
+    if (TempData["Score"] != null)
+        int.TryParse(TempData["Score"].ToString(), out score);
+    
+    if (TempData["Total"] != null)
+        int.TryParse(TempData["Total"].ToString(), out total);
+    
+    if (TempData["Percentage"] != null)
+        double.TryParse(TempData["Percentage"].ToString(), out percentage);
+    
+    var title = TempData["EvaluationTitle"] as string ?? "Évaluation";
+    
+    int nextEvalId = 0;
+    if (TempData["NextEvaluationId"] != null)
+        int.TryParse(TempData["NextEvaluationId"].ToString(), out nextEvalId);
+    
+    var nextEvalTitle = TempData["NextEvaluationTitle"] as string;
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-body text-center p-5">
+            <h1 class="mb-4">🎉 Évaluation Terminée !</h1>
+            
+            <div class="alert alert-info">
+                <h3>@title</h3>
+            </div>
+
+            <div class="my-5">
+                <div class="display-1 mb-3">
+                    @if (percentage >= 75)
+                    {
+                        <span class="text-success">✅</span>
+                    }
+                    else if (percentage >= 50)
+                    {
+                        <span class="text-warning">⚠️</span>
+                    }
+                    else
+                    {
+                        <span class="text-danger">❌</span>
+                    }
+                </div>
+                
+                <h2>Votre Score</h2>
+                <div class="display-3 fw-bold mb-3">
+                    <span class="@(percentage >= 75 ? "text-success" : percentage >= 50 ? "text-warning" : "text-danger")">
+                        @percentage.ToString("F1")%
+                    </span>
+                </div>
+                
+                <p class="lead">
+                    Vous avez répondu correctement à <strong>@score</strong> question(s) sur <strong>@total</strong>
+                </p>
+
+                <div class="progress mt-4" style="height: 30px;">
+                    <div class="progress-bar @(percentage >= 75 ? "bg-success" : percentage >= 50 ? "bg-warning" : "bg-danger")" 
+                         role="progressbar" 
+                         style="width: @percentage%">
+                        @percentage.ToString("F1")%
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5">
+                @if (percentage >= 75)
+                {
+                    <div class="alert alert-success">
+                        <h4>🏆 Félicitations !</h4>
+                        <p>Vous avez réussi cette évaluation avec brio !</p>
+                    </div>
+                }
+                else if (percentage >= 50)
+                {
+                    <div class="alert alert-warning">
+                        <h4>📚 Bien joué !</h4>
+                        <p>Vous pouvez encore améliorer votre score.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger">
+                        <h4>💪 Continuez vos efforts !</h4>
+                        <p>N'hésitez pas à réessayer pour améliorer votre score.</p>
+                    </div>
+                }
+            </div>
+
+            @if (nextEvalId > 0 && !string.IsNullOrEmpty(nextEvalTitle))
+            {
+                <div class="mt-4">
+                    <hr />
+                    <h5>Prochaine évaluation disponible :</h5>
+                    <p class="lead">@nextEvalTitle</p>
+                    <a asp-action="PasserEvaluation" asp-route-id="@nextEvalId" class="btn btn-success btn-lg">
+                        ▶️ Commencer l'évaluation suivante
+                    </a>
+                </div>
+            }
+
+            <div class="d-flex gap-3 justify-content-center mt-4">
+                <a asp-controller="Dashboard" asp-action="Index" class="btn btn-primary btn-lg">
+                    📊 Voir mon Dashboard
+                </a>
+                <a asp-controller="Evaluations" asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                    📝 Autres Évaluations
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

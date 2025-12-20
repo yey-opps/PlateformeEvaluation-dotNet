@@ -1,0 +1,195 @@
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using WebApplication1.Data
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@inject ApplicationDbContext Context
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor ContextAccessor
+
+
+@{
+var totalCandidats = Context.Candidats.Count();
+}
+
+@{
+string displayName = "Utilisateur";
+
+if (SignInManager.IsSignedIn(User))
+{
+    var userId = UserManager.GetUserId(User);
+    var candidat = await Context.Candidats.FirstOrDefaultAsync(c => c.UserId == userId);
+
+    if (candidat != null)
+    {
+        displayName = $"{candidat.Prenom} {candidat.Nom}";
+    }
+    else
+    {
+        var user = await UserManager.GetUserAsync(User);
+        displayName = user?.Email ?? "Utilisateur";
+    }
+}
+}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HireDesk</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Dashboard CSS -->
+    <link rel="stylesheet" href="~/css/dashboard-hiredesk.css" asp-append-version="true" />
+    
+    <style>
+        /* Fix emoji rendering */
+        .brand-icon, .nav-icon, .search-icon {
+            font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="dashboard-body">
+    <div class="dashboard-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">📋</div>
+                <span class="brand-text">HireDesk</span>
+                <button class="sidebar-toggle">◀</button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="@Url.Action("Index", "Dashboard")" class="nav-link active">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Tableau de bord</span>
+                </a>
+
+                <a href="@Url.Action("Index", "Candidats")" class="nav-link">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">Candidats</span>
+                    <span class="nav-badge">@totalCandidats</span>
+                </a>
+
+                <a href="@Url.Action("Index", "Evaluations")" class="nav-link">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Évaluations</span>
+                    <span class="nav-badge">8</span>
+                </a>
+
+                <a href="#" class="nav-link">
+                    <span class="nav-icon">💼</span>
+                    <span class="nav-text">Offres d'emploi</span>
+                </a>
+
+                <a href="#" class="nav-link">
+                    <span class="nav-icon">📅</span>
+                    <span class="nav-text">Entretiens</span>
+                    <span class="nav-badge">3</span>
+                </a>
+
+                <a href="#" class="nav-link">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Statistiques</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="#" class="nav-link">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Paramètres</span>
+                </a>
+
+                <form asp-area="Identity"
+                      asp-page="/Account/Logout"
+                      asp-route-returnUrl="@Url.Action("Index", "Home")"
+                      method="post">
+                    <button type="submit" class="nav-link logout-btn">
+                        <span class="nav-icon">🚪</span>
+                        <span class="nav-text">Déconnexion</span>
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <div class="dashboard-main">
+
+            <!-- TOPBAR -->
+            <header class="dashboard-topbar">
+                <div class="topbar-left">
+                    <form method="get" action="" style="margin:0;" class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text"
+                               name="search"
+                               class="search-input"
+                               value="@ViewContext.HttpContext.Request.Query["search"]"
+                               placeholder="Rechercher sur cette page…" />
+                    </form>
+                </div>
+
+                <div class="topbar-right">
+                    <a href="@Url.Action("Create", "Candidats")" class="btn-add-candidate">
+                        <span>+</span>
+                        <span>Ajouter un candidat</span>
+                    </a>
+
+                    <button class="notification-btn">
+                        🔔
+                        <span class="notification-dot"></span>
+                    </button>
+
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <div style="display:flex; align-items:center; gap:10px; margin-left:15px;">
+                            <div style="
+                                width:36px;
+                                height:36px;
+                                border-radius:50%;
+                                background:#10b981;
+                                color:white;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                                font-weight:600;">
+                                @displayName.Substring(0,1).ToUpper()
+                            </div>
+
+                            <div style="display:flex; flex-direction:column; line-height:1;">
+                                <span style="font-weight:600; color:#111;">
+                                    @displayName
+                                </span>
+                                <small style="color:#6b7280;">
+                                    Administrateur
+                                </small>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </header>
+
+            <!-- CONTENU -->
+            <main class="dashboard-content">
+                @RenderBody()
+            </main>
+
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

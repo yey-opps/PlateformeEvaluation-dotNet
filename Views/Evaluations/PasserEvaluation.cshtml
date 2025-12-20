@@ -1,0 +1,73 @@
+@model WebApplication1.Models.PasserEvaluationViewModel
+
+<div class="container mt-4">
+
+    <h2 class="fw-bold">@Model.Titre</h2>
+    <p>@Model.Description</p>
+    <p><strong>Durée :</strong> @Model.DureeMinutes minutes</p>
+
+    <div class="alert alert-info">
+        Temps restant : <span id="timer"></span>
+    </div>
+
+    <form asp-action="Submit" method="post">
+        @Html.AntiForgeryToken()
+        
+        <input type="hidden" name="EvaluationId" value="@Model.EvaluationId" />
+        <input type="hidden" name="Titre" value="@Model.Titre" />
+        <input type="hidden" name="Description" value="@Model.Description" />
+        <input type="hidden" name="DureeMinutes" value="@Model.DureeMinutes" />
+
+        <hr />
+
+        @for (int i = 0; i < Model.Questions.Count; i++)
+        {
+            <div class="mb-4 p-3 border rounded shadow-sm">
+                <h4>Question @(i + 1): @Model.Questions[i].Texte</h4>
+
+                @foreach (var option in Model.Questions[i].Options)
+                {
+                    <label class="d-block my-1">
+                        <input type="radio"
+                               name="Questions[@i].SelectedOptionId"
+                               value="@option.Id"
+                               class="form-check-input me-2" />
+                        @option.Texte
+                    </label>
+                }
+
+                <input type="hidden" name="Questions[@i].QuestionId" value="@Model.Questions[i].QuestionId" />
+                <input type="hidden" name="Questions[@i].Texte" value="@Model.Questions[i].Texte" />
+            </div>
+
+            <hr />
+        }
+
+        <button type="submit" class="btn btn-primary btn-lg w-100">
+            Valider mes réponses
+        </button>
+    </form>
+
+    @* temps *@
+    <script>
+        let totalSeconds = @Model.DureeMinutes * 60;
+
+        function updateTimer() {
+            let minutes = Math.floor(totalSeconds / 60);
+            let seconds = totalSeconds % 60;
+
+            document.getElementById("timer").innerText =
+                minutes + " min " + (seconds < 10 ? "0" : "") + seconds + " sec";
+
+            if (totalSeconds <= 0) {
+                document.forms[0].submit();  // auto-submit when time runs out
+            } else {
+                totalSeconds--;
+                setTimeout(updateTimer, 1000);
+            }
+        }
+
+        updateTimer();
+    </script>
+
+</div>

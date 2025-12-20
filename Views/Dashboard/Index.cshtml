@@ -1,0 +1,230 @@
+﻿@using System.Text.Json
+@using System.Linq
+@model WebApplication1.Models.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Tableau de bord";
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+
+    var culture = new System.Globalization.CultureInfo("fr-FR");
+    var aujourdhui = DateTime.Now.ToString("dddd dd MMMM yyyy", culture);
+    aujourdhui = char.ToUpper(aujourdhui[0]) + aujourdhui.Substring(1);
+}
+
+<div class="welcome-header">
+    <h1 class="welcome-title">
+        Bonjour, @Model.UserName 👋
+    </h1>
+    <p class="welcome-subtitle">Voici ce qui se passe avec vos candidats aujourd'hui.</p>
+    <p class="welcome-date">@aujourdhui</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon-box icon-green">👥</div>
+        </div>
+        <div class="stat-value">@Model.TotalCandidats</div>
+        <div class="stat-label">Total des candidats</div>
+        <div class="stat-footer">Données issues de la base</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon-box icon-blue">⏱️</div>
+        </div>
+        <div class="stat-value">@Model.TentativesNonTerminees</div>
+        <div class="stat-label">Tentatives non terminées</div>
+        <div class="stat-footer">
+            Évaluations commencées
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon-box icon-purple">✅</div>
+        </div>
+        <div class="stat-value">@Model.TotalEvaluationsTerminees</div>
+        <div class="stat-label">Évaluations terminées</div>
+        <div class="stat-footer">
+            @Model.EvaluationsTermineesCetteSemaine terminée@(Model.EvaluationsTermineesCetteSemaine > 1 ? "s" : "") cette semaine
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon-box icon-teal">📊</div>
+        </div>
+        <div class="stat-value">@Model.ScoreMoyen<span style="font-size: 1.2rem;">/100</span></div>
+        <div class="stat-label">Score moyen des évaluations</div>
+        <div class="stat-footer">
+            @if (Model.ScoreMoyen >= 75)
+            {
+            <span>Au-dessus de l'objectif de 75</span>
+            }
+            else if (Model.ScoreMoyen >= 50)
+            {
+            <span>Objectif de 75 non atteint</span>
+            }
+            else
+            {
+            <span>Bien en-dessous de l'objectif</span>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="section-card">
+    <div class="section-header">
+        <div>
+            <h2 class="section-title">Pipeline de recrutement</h2>
+            <p class="section-subtitle">Distribution des candidats par étape</p>
+        </div>
+        <select class="section-select">
+            <option>Ce mois-ci</option>
+            <option>Ce trimestre</option>
+            <option>Cette année</option>
+        </select>
+    </div>
+
+    <div class="pipeline-container">
+        <div class="pipeline-row">
+            <div class="pipeline-label">Candidatures reçues</div>
+            <div class="pipeline-bar-wrapper">
+                <div class="pipeline-bar" style="width: 100%;">@Model.TotalCandidats candidat@(Model.TotalCandidats > 1 ? "s" : "")</div>
+            </div>
+        </div>
+
+        <div class="pipeline-row">
+            <div class="pipeline-label">Évaluations en cours</div>
+            <div class="pipeline-bar-wrapper">
+                @{
+                    var pourcentageEnCours = Model.TotalCandidats > 0
+                        ? (Model.InProgressCount * 100.0 / Model.TotalCandidats)
+                        : 0;
+                }
+                <div class="pipeline-bar" style="width: @pourcentageEnCours%;">@Model.InProgressCount en cours</div>
+            </div>
+        </div>
+
+        <div class="pipeline-row">
+            <div class="pipeline-label">Évaluations terminées</div>
+            <div class="pipeline-bar-wrapper">
+                @{
+                    var pourcentageTerminees = Model.TotalCandidats > 0
+                        ? (Model.TotalEvaluationsTerminees * 100.0 / Model.TotalCandidats)
+                        : 0;
+                }
+                <div class="pipeline-bar" style="width: @pourcentageTerminees%;">@Model.TotalEvaluationsTerminees terminée@(Model.TotalEvaluationsTerminees > 1 ? "s" : "")</div>
+            </div>
+        </div>
+
+        <div class="pipeline-row">
+            <div class="pipeline-label">Cette semaine</div>
+            <div class="pipeline-bar-wrapper">
+                @{
+                    var pourcentageSemaine = Model.TotalEvaluationsTerminees > 0
+                        ? (Model.EvaluationsTermineesCetteSemaine * 100.0 / Model.TotalEvaluationsTerminees)
+                        : 0;
+                }
+                <div class="pipeline-bar" style="width: @pourcentageSemaine%;">@Model.EvaluationsTermineesCetteSemaine cette semaine</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section-card">
+    <div class="section-header">
+        <div>
+            <h2 class="section-title">Tentatives récentes</h2>
+            <p class="section-subtitle">Dernières évaluations passées</p>
+        </div>
+    </div>
+
+    @if (Model.RecentTentatives != null && Model.RecentTentatives.Any())
+    {
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0 0.5rem;">
+            <thead>
+                <tr style="border-bottom: 1px solid #f3f4f6;">
+                    <th style="text-align: left; padding: 0.75rem 1rem; color: #6b7280; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">CANDIDAT</th>
+                    <th style="text-align: left; padding: 0.75rem 1rem; color: #6b7280; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">ÉVALUATION</th>
+                    <th style="text-align: left; padding: 0.75rem 1rem; color: #6b7280; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">STATUT</th>
+                    <th style="text-align: left; padding: 0.75rem 1rem; color: #6b7280; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">SCORE</th>
+                    <th style="text-align: left; padding: 0.75rem 1rem; color: #6b7280; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">DATE</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tentative in Model.RecentTentatives.Take(10))
+                    {
+                        var initiales = "C";
+                        var nomComplet = "Candidat";
+                        var email = "candidat@email.com";
+
+                        if (tentative.Candidat != null)
+                        {
+                            var prenom = tentative.Candidat.Prenom ?? "";
+                            var nom = tentative.Candidat.Nom ?? "";
+                            nomComplet = $"{prenom} {nom}".Trim();
+                            if (string.IsNullOrWhiteSpace(nomComplet)) nomComplet = "Candidat";
+
+                            initiales = (prenom.Length > 0 ? prenom[0].ToString() : "") +
+                                       (nom.Length > 0 ? nom[0].ToString() : "");
+                            if (string.IsNullOrWhiteSpace(initiales)) initiales = "C";
+
+                            email = tentative.Candidat.Email ?? "candidat@email.com";
+                        }
+
+                        var dateFormatee = tentative.DatePassage.ToString("dd MMM yyyy", culture);
+                        var statutCouleur = tentative.Score > 0
+                            ? "background: rgba(16, 185, 129, 0.1); color: #10b981;"
+                            : "background: rgba(245, 158, 11, 0.1); color: #f59e0b;";
+                        var statutTexte = tentative.Score > 0 ? "Terminée" : "En cours";
+
+                <tr style="background: #f9fafb;">
+                    <td style="padding: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #14b8a6); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                                @initiales.ToUpper()
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: #111827;">@nomComplet</div>
+                                <div style="font-size: 0.85rem; color: #6b7280;">@email</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="padding: 1rem;">
+                        <div style="font-weight: 500; color: #111827;">@(tentative.Evaluation?.Titre ?? "Évaluation")</div>
+                    </td>
+                    <td style="padding: 1rem;">
+                        <span style="padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; @statutCouleur">@statutTexte</span>
+                    </td>
+                    <td style="padding: 1rem;">
+                        @if (tentative.Score > 0)
+                                {
+                        <span style="font-weight: 600; color: #10b981;">@tentative.Score/100</span>
+                                }
+                                else
+                                {
+                        <span style="color: #9ca3af;">En attente</span>
+                                }
+                    </td>
+                    <td style="padding: 1rem; color: #6b7280;">@dateFormatee</td>
+                </tr>
+                    }
+            </tbody>
+        </table>
+    </div>
+    }
+    else
+    {
+    <div style="text-align: center; padding: 3rem; color: #6b7280;">
+        <p style="font-size: 1.1rem;">📋 Aucune tentative récente</p>
+    </div>
+    }
+</div>
+
+<script>
+    window.__EVALS = @Html.Raw(JsonSerializer.Serialize(Model.AvailableEvaluations, new System.Text.Json.JsonSerializerOptions { ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles }));
+</script>
+<script src="/js/inline-quiz.js"></script>

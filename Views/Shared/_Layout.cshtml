@@ -1,0 +1,328 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] Entreprise</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/home-modern.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/home-creative.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WebApplication1.styles.css" asp-append-version="true" />
+    
+    <style>
+        /* ================================
+           FOOTER STYLES - MATCHING NAVBAR
+           ================================ */
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            padding: 0;
+            margin-top: auto;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .footer-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            padding: 1rem 2rem;
+            min-height: 70px;
+            flex-wrap: wrap;
+        }
+
+        .footer-brand {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 0;
+        }
+
+        .footer-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .footer-nav,
+        .footer-resources,
+        .footer-legal {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+
+        .footer-nav a,
+        .footer-resources a,
+        .footer-legal a {
+            font-weight: 500;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            padding: 0.5rem 0.25rem;
+        }
+
+        .footer-nav a::after,
+        .footer-resources a::after,
+        .footer-legal a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            transform: translateX(-50%);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .footer-nav a:hover,
+        .footer-resources a:hover,
+        .footer-legal a:hover {
+            color: #6366f1;
+        }
+
+        .footer-nav a:hover::after,
+        .footer-resources a:hover::after,
+        .footer-legal a:hover::after {
+            width: 80%;
+        }
+
+        .separator {
+            color: #cbd5e1;
+            font-weight: 300;
+        }
+
+        .footer-social {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            color: #6366f1;
+            text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .social-icon:hover {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            color: white;
+            transform: translateY(-3px);
+            border-color: #6366f1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer-copyright {
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 0.75rem 2rem;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85rem;
+            width: 100%;
+        }
+
+        /* Dark mode */
+        body.dark-mode .footer {
+            background: rgba(30, 41, 59, 0.95);
+            border-top-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .footer-nav a,
+        body.dark-mode .footer-resources a,
+        body.dark-mode .footer-legal a {
+            color: #cbd5e1;
+        }
+
+        body.dark-mode .footer-copyright {
+            border-top-color: rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+        }
+
+        /* Responsive */
+        @@media (max-width: 1200px) {
+            .footer-container {
+                gap: 1rem;
+                padding: 0.875rem 1.5rem;
+            }
+
+            .footer-nav,
+            .footer-resources,
+            .footer-legal {
+                font-size: 0.875rem;
+                gap: 0.75rem;
+            }
+            
+            .footer-brand {
+                font-size: 1.35rem;
+            }
+        }
+
+        @@media (max-width: 992px) {
+            .footer-container {
+                justify-content: center;
+                gap: 0.875rem;
+                padding: 0.875rem 1rem;
+            }
+
+            .footer-brand {
+                width: 100%;
+                text-align: center;
+                margin-bottom: 0.5rem;
+            }
+
+            .footer-nav,
+            .footer-resources,
+            .footer-legal {
+                font-size: 0.8rem;
+                gap: 0.5rem;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .footer-container {
+                flex-direction: column;
+                gap: 0.75rem;
+                padding: 1rem 0.75rem;
+            }
+
+            .footer-nav,
+            .footer-resources,
+            .footer-legal {
+                font-size: 0.75rem;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.4rem;
+            }
+
+            .social-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 0.75rem;
+            }
+
+            .footer-copyright {
+                padding: 0.65rem 0.75rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .separator {
+                display: none;
+            }
+
+            .footer-nav a,
+            .footer-resources a,
+            .footer-legal a {
+                padding: 0.35rem 0.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">WebApplication1</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#features">Fonctionnalités</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#stats">Statistiques</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                        <li class="nav-item">
+    <a class="nav-link text-dark" asp-controller="Evaluations" asp-action="PasserEvaluation" asp-route-id="1">
+        Passer l'Évaluation
+    </a>
+</li>
+                    </ul>
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div>
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-container container">
+            <div class="footer-brand">
+                EvalPro
+            </div>
+            
+            <div class="footer-nav">
+                <a asp-area="" asp-controller="Home" asp-action="Index">Accueil</a>
+                <span class="separator">•</span>
+                <a asp-area="" asp-controller="Candidats" asp-action="Index">Candidats</a>
+                <span class="separator">•</span>
+                <a asp-area="" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+            </div>
+            
+            <div class="footer-resources">
+                <a href="#features">Fonctionnalités</a>
+                <span class="separator">•</span>
+                <a href="#">Documentation</a>
+                <span class="separator">•</span>
+                <a href="#">Support</a>
+            </div>
+            
+            <div class="footer-legal">
+                <a href="#">CGU</a>
+                <span class="separator">•</span>
+                <a asp-area="" asp-controller="Home" asp-action="Privacy">Confidentialité</a>
+            </div>
+            
+            <div class="footer-social">
+                <a href="#" class="social-icon" title="LinkedIn">in</a>
+                <a href="#" class="social-icon" title="Twitter">X</a>
+                <a href="#" class="social-icon" title="GitHub">gh</a>
+            </div>
+        </div>
+        
+        <div class="footer-copyright">
+            © 2025 EvalPro. Tous droits réservés. Conçu avec passion pour optimiser votre recrutement.
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,21 @@
+@model WebApplication1.Models.Evaluation
+
+<h2>@Model.Titre</h2>
+<p>@Model.Description</p>
+<p><strong>Durée :</strong> @Model.DureeMinutes minutes</p>
+
+<hr />
+
+@foreach (var q in Model.Questions)
+{
+    <h4>Question @q.Id: @q.Texte</h4>
+
+    <ul>
+        @foreach (var op in q.Options)
+        {
+            <li>@op.Texte</li>
+        }
+    </ul>
+
+    <hr/>
+}

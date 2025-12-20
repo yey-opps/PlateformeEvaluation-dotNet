@@ -1,0 +1,205 @@
+@model WebApplication1.Models.Candidat
+
+@{
+    ViewData["Title"] = "Profil du candidat";
+    Layout = "_LayoutDashboard";
+
+    var totalTentatives = Model.Tentatives?.Count ?? 0;
+    var completedTentatives = Model.Tentatives?.Count(t => t.Score > 0) ?? 0;
+    var averageScore = Model.Tentatives != null && Model.Tentatives.Any()
+        ? Math.Round(Model.Tentatives.Average(t => t.Score), 2)
+        : 0;
+    var bestScore = Model.Tentatives != null && Model.Tentatives.Any()
+        ? Model.Tentatives.Max(t => t.Score)
+        : 0;
+}
+
+<!-- En-tête -->
+<div class="page-header mb-4 d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="page-title">
+            @Model.Prenom @Model.Nom
+        </h1>
+        <p class="page-subtitle">
+            Profil détaillé et suivi des évaluations du candidat.
+        </p>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+            ✏️ Modifier
+        </a>
+        <a asp-action="Index" class="btn btn-light">
+            ← Retour
+        </a>
+    </div>
+</div>
+
+<!-- Infos + Stats -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title mb-3">👤 Informations personnelles</h5>
+
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Nom</dt>
+                    <dd class="col-sm-8">@Model.Nom</dd>
+
+                    <dt class="col-sm-4">Prénom</dt>
+                    <dd class="col-sm-8">@Model.Prenom</dd>
+
+                    <dt class="col-sm-4">Email</dt>
+                    <dd class="col-sm-8">@Model.Email</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title mb-3">📊 Statistiques globales</h5>
+
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="stat-value">@totalTentatives</div>
+                        <div class="stat-label">Tentatives</div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="stat-value">@completedTentatives</div>
+                        <div class="stat-label">Complétées</div>
+                    </div>
+                    <div class="col-6">
+<div class="stat-value">@averageScore.ToString("0.00")%</div>
+                        <div class="stat-label">Score moyen</div>
+                    </div>
+                    <div class="col-6">
+<div class="stat-value">@bestScore.ToString("0.00")%</div>
+                        <div class="stat-label">Meilleur score</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Évaluations -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title mb-3">🎯 Évaluations</h5>
+
+        @if (Model.Tentatives != null && Model.Tentatives.Any())
+        {
+            var tentativesGrouped = Model.Tentatives
+                .GroupBy(t => t.Evaluation?.Titre ?? "Évaluation inconnue");
+
+            <div class="accordion" id="evaluationsAccordion">
+                @{ int index = 0; }
+
+                @foreach (var group in tentativesGrouped)
+                {
+                    var evalTentatives = group.OrderByDescending(t => t.DatePassage).ToList();
+                    var evalAvg = Math.Round(evalTentatives.Average(t => t.Score), 2);
+                    var evalBest = evalTentatives.Max(t => t.Score);
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button @(index > 0 ? "collapsed" : "")"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#eval@index">
+                                <strong>@group.Key</strong>
+                                <span class="ms-auto d-flex gap-2">
+                                    <span class="badge bg-secondary">@evalTentatives.Count</span>
+                                    <span class="badge bg-primary">Moy @evalAvg.ToString("0.00")%</span>
+                                    <span class="badge bg-success">Max @evalBest.ToString("0.00")%</span>
+                                </span>
+                            </button>
+                        </h2>
+
+                        <div id="eval@index"
+                             class="accordion-collapse collapse @(index == 0 ? "show" : "")">
+                            <div class="accordion-body">
+
+                                <table class="table table-sm align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Score</th>
+                                            <th>Statut</th>
+                                            <th class="text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var t in evalTentatives)
+                                        {
+                                            var status = t.Score >= 75 ? "Réussi" :
+                                                         t.Score >= 50 ? "Passable" :
+                                                         t.Score > 0 ? "Insuffisant" : "Non complété";
+
+                                            var badge = t.Score >= 75 ? "bg-success" :
+                                                        t.Score >= 50 ? "bg-warning" :
+                                                        t.Score > 0 ? "bg-danger" : "bg-secondary";
+
+                                            <tr>
+                                                <td>@t.DatePassage.ToString("dd/MM/yyyy HH:mm")</td>
+<td>
+    <strong>@t.Score.ToString("0.00")%</strong>
+</td>                                                <td><span class="badge @badge">@status</span></td>
+                                                <td class="text-end">
+                                                    <a asp-controller="Tentatives"
+                                                       asp-action="Details"
+                                                       asp-route-id="@t.Id"
+                                                       class="btn btn-sm btn-outline-info">
+                                                        Voir
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    index++;
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted mb-0">Aucune évaluation passée.</p>
+        }
+    </div>
+</div>
+
+<!-- Actions finales -->
+<div class="d-flex gap-2 mb-4">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+        ✏️ Modifier le profil
+    </a>
+
+    <a asp-action="Delete"
+       asp-route-id="@Model.Id"
+       class="btn btn-danger"
+       onclick="return confirm('Supprimer ce candidat ?')">
+        🗑 Supprimer
+    </a>
+</div>
+
+<style>
+    .stat-value {
+        font-size: 1.6rem;
+        font-weight: 700;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background-color: #f0f9ff;
+    }
+</style>

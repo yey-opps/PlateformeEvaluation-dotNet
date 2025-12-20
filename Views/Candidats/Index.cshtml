@@ -1,0 +1,81 @@
+@model IEnumerable<WebApplication1.Models.Candidat>
+
+@{
+    ViewData["Title"] = "Candidats";
+    Layout = "_LayoutDashboard";
+}
+
+<!-- En-tête de page -->
+<div class="page-header mb-4 d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="page-title">Candidats</h1>
+        <p class="page-subtitle">
+            Gérez l’ensemble des candidats inscrits sur la plateforme.
+        </p>
+    </div>
+
+    <a asp-action="Create" class="btn btn-success">
+        + Ajouter un candidat
+    </a>
+</div>
+
+<!-- Carte liste -->
+<div class="card">
+    <div class="card-body">
+
+        @if (!Model.Any())
+        {
+            <div class="text-center text-muted py-5">
+                Aucun candidat n’a encore été ajouté.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Email</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Nom</td>
+                                <td>@item.Prenom</td>
+                                <td>@item.Email</td>
+
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-2">
+                                        <a asp-action="Details"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-info btn-sm text-white">
+                                            👁 Voir
+                                        </a>
+
+                                        <a asp-action="Edit"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-warning btn-sm text-dark">
+                                            ✏️ Modifier
+                                        </a>
+
+                                        <a asp-action="Delete"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-danger btn-sm">
+                                            🗑 Supprimer
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+    </div>
+</div>

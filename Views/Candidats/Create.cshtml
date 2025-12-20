@@ -1,0 +1,63 @@
+@model WebApplication1.Models.Candidat
+
+@{
+    ViewData["Title"] = "Ajouter un candidat";
+    Layout = "_LayoutDashboard";
+}
+
+<!-- Titre de page -->
+<div class="page-header mb-4">
+    <h1 class="page-title">Ajouter un candidat</h1>
+    <p class="page-subtitle">
+        Créez un nouveau profil candidat afin de lancer le processus d’évaluation.
+    </p>
+</div>
+
+<!-- Carte formulaire -->
+<div class="card">
+    <div class="card-body">
+
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+
+            <div class="row">
+                <!-- Prénom -->
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Prenom" class="form-label">Prénom</label>
+                    <input asp-for="Prenom" class="form-control" placeholder="Ex : Samir" />
+                    <span asp-validation-for="Prenom" class="text-danger"></span>
+                </div>
+
+                <!-- Nom -->
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Nom" class="form-label">Nom</label>
+                    <input asp-for="Nom" class="form-control" placeholder="Ex : Benali" />
+                    <span asp-validation-for="Nom" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-4">
+                <label asp-for="Email" class="form-label">Adresse email</label>
+                <input asp-for="Email" class="form-control" placeholder="exemple@email.com" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-action="Index" class="btn btn-light">
+                    Annuler
+                </a>
+
+                <button type="submit" class="btn btn-success">
+                    Ajouter le candidat
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
