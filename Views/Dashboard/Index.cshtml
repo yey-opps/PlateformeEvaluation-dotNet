@@ -77,61 +77,115 @@
 <div class="section-card">
     <div class="section-header">
         <div>
-            <h2 class="section-title">Pipeline de recrutement</h2>
-            <p class="section-subtitle">Distribution des candidats par étape</p>
+            <h2 class="section-title">Pipeline de Recrutement</h2>
+            <p class="section-subtitle">Répartition des candidats par étape</p>
         </div>
-        <select class="section-select">
-            <option>Ce mois-ci</option>
-            <option>Ce trimestre</option>
-            <option>Cette année</option>
-        </select>
     </div>
 
-    <div class="pipeline-container">
-        <div class="pipeline-row">
-            <div class="pipeline-label">Candidatures reçues</div>
-            <div class="pipeline-bar-wrapper">
-                <div class="pipeline-bar" style="width: 100%;">@Model.TotalCandidats candidat@(Model.TotalCandidats > 1 ? "s" : "")</div>
+    @{
+        // Vraies données depuis le modèle
+        var totalCandidats = Model.TotalCandidats;
+        var enCours = Model.InProgressCount;
+        var terminees = Model.TotalEvaluationsTerminees;
+        var cetteSemaine = Model.EvaluationsTermineesCetteSemaine;
+
+        var pipelineData = new[]
+        {
+            new { Label = "Candidatures reçues", Value = totalCandidats },
+            new { Label = "Évaluations en cours", Value = enCours },
+            new { Label = "Évaluations terminées", Value = terminees },
+            new { Label = "Cette semaine", Value = cetteSemaine }
+        };
+
+        var maxVal = pipelineData.Max(x => x.Value);
+        if (maxVal == 0) maxVal = 10;
+    }
+
+    <div style="padding: 40px 20px; position: relative;">
+        <!-- Barres horizontales -->
+        <div style="display: grid; grid-template-columns: 180px 1fr; gap: 16px 30px; align-items: center;">
+            @foreach (var item in pipelineData)
+            {
+            <div style="text-align: right; font-weight: 500; color: #374151; font-size: 0.95rem;">
+                @item.Label
             </div>
+
+            <div style="position: relative; height: 40px; background: #e5e7eb; border-radius: 8px; overflow: hidden;">
+                @{
+                        var percentage = maxVal > 0 ? (item.Value * 100.0 / maxVal) : 0;
+                        var displayWidth = item.Value > 0 ? Math.Max(percentage, 3) : 0;
+                }
+                @if (item.Value > 0)
+                    {
+                <div class="pipeline-bar-hover"
+                     data-label="@item.Label"
+                     data-count="@item.Value"
+                     style="width: @displayWidth%; height: 100%; background: linear-gradient(90deg, #10b981, #14b8a6); border-radius: 8px; cursor: pointer; transition: all 0.3s; position: relative;">
+                </div>
+                    }
+            </div>
+            }
         </div>
 
-        <div class="pipeline-row">
-            <div class="pipeline-label">Évaluations en cours</div>
-            <div class="pipeline-bar-wrapper">
-                @{
-                    var pourcentageEnCours = Model.TotalCandidats > 0
-                        ? (Model.InProgressCount * 100.0 / Model.TotalCandidats)
-                        : 0;
+        <!-- Axe horizontal -->
+        <div style="display: grid; grid-template-columns: 180px 1fr; gap: 30px; margin-top: 15px;">
+            <div></div>
+            <div style="display: flex; justify-content: space-between; color: #9ca3af; font-size: 0.85rem;">
+                <span>0</span>
+                @if (maxVal >= 4)
+                {
+                <span>@((int)(maxVal / 4))</span>
+                <span>@((int)(maxVal / 2))</span>
+                <span>@((int)(maxVal * 3 / 4))</span>
                 }
-                <div class="pipeline-bar" style="width: @pourcentageEnCours%;">@Model.InProgressCount en cours</div>
+                <span>@maxVal</span>
             </div>
         </div>
+    </div>
 
-        <div class="pipeline-row">
-            <div class="pipeline-label">Évaluations terminées</div>
-            <div class="pipeline-bar-wrapper">
-                @{
-                    var pourcentageTerminees = Model.TotalCandidats > 0
-                        ? (Model.TotalEvaluationsTerminees * 100.0 / Model.TotalCandidats)
-                        : 0;
-                }
-                <div class="pipeline-bar" style="width: @pourcentageTerminees%;">@Model.TotalEvaluationsTerminees terminée@(Model.TotalEvaluationsTerminees > 1 ? "s" : "")</div>
-            </div>
-        </div>
-
-        <div class="pipeline-row">
-            <div class="pipeline-label">Cette semaine</div>
-            <div class="pipeline-bar-wrapper">
-                @{
-                    var pourcentageSemaine = Model.TotalEvaluationsTerminees > 0
-                        ? (Model.EvaluationsTermineesCetteSemaine * 100.0 / Model.TotalEvaluationsTerminees)
-                        : 0;
-                }
-                <div class="pipeline-bar" style="width: @pourcentageSemaine%;">@Model.EvaluationsTermineesCetteSemaine cette semaine</div>
-            </div>
-        </div>
+    <!-- Tooltip -->
+    <div id="pipelineTooltip" style="display: none; position: fixed; background: white; padding: 12px 16px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #e5e7eb; pointer-events: none; z-index: 1000;">
+        <div style="font-weight: 700; color: #111827; margin-bottom: 4px;" id="tooltipLabel"></div>
+        <div style="color: #10b981; font-size: 0.95rem;" id="tooltipValue"></div>
     </div>
 </div>
+
+<style>
+    .pipeline-bar-hover:hover {
+        filter: brightness(1.1);
+        transform: scaleY(1.05);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const bars = document.querySelectorAll('.pipeline-bar-hover');
+        const tooltip = document.getElementById('pipelineTooltip');
+        const tooltipLabel = document.getElementById('tooltipLabel');
+        const tooltipValue = document.getElementById('tooltipValue');
+
+        bars.forEach(bar => {
+            bar.addEventListener('mouseenter', function (e) {
+                const label = this.getAttribute('data-label');
+                const count = this.getAttribute('data-count');
+
+                tooltipLabel.textContent = label;
+                tooltipValue.textContent = `Nombre : ${count}`;
+
+                tooltip.style.display = 'block';
+            });
+
+            bar.addEventListener('mousemove', function (e) {
+                tooltip.style.left = (e.clientX + 15) + 'px';
+                tooltip.style.top = (e.clientY - 50) + 'px';
+            });
+
+            bar.addEventListener('mouseleave', function () {
+                tooltip.style.display = 'none';
+            });
+        });
+    });
+</script>
 
 <div class="section-card">
     <div class="section-header">

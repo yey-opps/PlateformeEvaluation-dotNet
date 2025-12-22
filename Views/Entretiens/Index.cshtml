@@ -1,0 +1,255 @@
+@model IEnumerable<WebApplication1.Models.Candidat>
+    @{
+    ViewData["Title"] = "Entretiens";
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    var entretiens = ViewBag.Entretiens as List<WebApplication1.Models.Entretien> ?? new List<WebApplication1.Models.Entretien>();
+    }
+
+    <div class="page-header mb-4">
+        <h1 style="font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 0.5rem;">📅 Entretiens</h1>
+        <p style="color: #6b7280; font-size: 1rem;">
+            Gérez les entretiens pour les candidats qualifiés
+        </p>
+    </div>
+
+    @if (TempData["Success"] != null)
+{
+    <div style="background: #d1fae5; border: 1px solid #10b981; padding: 14px 18px; border-radius: 12px; margin-bottom: 24px; color: #065f46; font-weight: 500;">
+        ✅ @TempData["Success"]
+    </div>
+}
+
+    <!-- CANDIDATS QUALIFIÉS SANS ENTRETIEN -->
+    <div style="background: white; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: #111827; margin-bottom: 20px;">
+            Candidats qualifiés (Score ≥ 60%)
+        </h2>
+
+        @if (!Model.Any())
+    {
+        <div style="text-align: center; padding: 40px; color: #6b7280;">
+            <div style="font-size: 48px; margin-bottom: 16px;">📭</div>
+            <p>Aucun candidat qualifié pour l'instant.</p>
+        </div>
+    }
+    else
+    {
+        <div style="display: grid; gap: 16px;">
+            @foreach (var candidat in Model)
+            {
+                var hasEntretien = entretiens.Any(e => e.CandidatId == candidat.Id && e.Statut != "Annulé");
+
+                if (!hasEntretien)
+                {
+                    var initiales = $"{(candidat.Prenom?.Length > 0 ? candidat.Prenom[0].ToString() : "")}{(candidat.Nom?.Length > 0 ? candidat.Nom[0].ToString() : "")}";
+
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #14b8a6); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                        @initiales.ToUpper()
+                    </div>
+                    <div>
+                        <h3 style="font-weight: 600; color: #111827; margin-bottom: 4px;">
+                            @candidat.Prenom @candidat.Nom
+                        </h3>
+                        <p style="color: #6b7280; font-size: 0.9rem; margin: 0;">
+                            @candidat.Email
+                        </p>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #10b981;">
+                            @(candidat.ScoreGlobal?.ToString("F1") ?? "N/A")%
+                        </div>
+                        <div style="font-size: 0.8rem; color: #6b7280;">Score global</div>
+                    </div>
+
+                    <button onclick="showProgrammerModal(@candidat.Id, '@candidat.Prenom', '@candidat.Nom')"
+                            style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                        📅 Programmer entretien
+                    </button>
+                </div>
+            </div>
+                }
+            }
+        </div>
+    }
+    </div>
+
+    <!-- ENTRETIENS PROGRAMMÉS -->
+    <div style="background: white; border-radius: 16px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: #111827; margin-bottom: 20px;">
+            Entretiens programmés
+        </h2>
+
+        @if (!entretiens.Any(e => e.Statut == "Programmé"))
+    {
+        <div style="text-align: center; padding: 40px; color: #6b7280;">
+            <div style="font-size: 48px; margin-bottom: 16px;">📅</div>
+            <p>Aucun entretien programmé.</p>
+        </div>
+    }
+    else
+    {
+        <div style="display: grid; gap: 16px;">
+            @foreach (var entretien in entretiens.Where(e => e.Statut == "Programmé").OrderBy(e => e.DateEntretien))
+            {
+                var candidat = entretien.Candidat;
+                var initiales = candidat != null ? $"{(candidat.Prenom?.Length > 0 ? candidat.Prenom[0].ToString() : "")}{(candidat.Nom?.Length > 0 ? candidat.Nom[0].ToString() : "")}" : "??";
+
+            <div style="border: 2px solid #3b82f6; border-radius: 12px; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #2563eb); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                            @initiales.ToUpper()
+                        </div>
+                        <div>
+                            <h3 style="font-weight: 600; color: #111827; margin-bottom: 4px;">
+                                @(candidat?.Prenom ?? "") @(candidat?.Nom ?? "")
+                            </h3>
+                            <p style="color: #6b7280; font-size: 0.9rem; margin: 0;">
+                                @(candidat?.Email ?? "")
+                            </p>
+                        </div>
+                    </div>
+
+                    <span style="padding: 6px 12px; background: #dbeafe; color: #1e40af; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
+                        @entretien.Statut
+                    </span>
+                </div>
+
+                <div style="background: #f9fafb; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                        <div>
+                            <div style="font-size: 0.8rem; color: #6b7280; margin-bottom: 4px;">📅 Date</div>
+                            <div style="font-weight: 600; color: #111827;">@entretien.DateEntretien.ToString("dd/MM/yyyy HH:mm")</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.8rem; color: #6b7280; margin-bottom: 4px;">🎯 Type</div>
+                            <div style="font-weight: 600; color: #111827;">@(entretien.TypeEntretien ?? "N/A")</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.8rem; color: #6b7280; margin-bottom: 4px;">📍 Lieu</div>
+                            <div style="font-weight: 600; color: #111827;">@(entretien.Lieu ?? "N/A")</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <form method="post" asp-action="Embaucher" asp-route-entretienId="@entretien.Id" style="display: inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                            ✅ Embaucher
+                        </button>
+                    </form>
+
+                    <button onclick="showRejectModal(@entretien.Id)" style="padding: 10px 20px; background: white; color: #ef4444; border: 2px solid #ef4444; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                        ❌ Rejeter
+                    </button>
+
+                    <form method="post" asp-action="Annuler" asp-route-entretienId="@entretien.Id" style="display: inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" style="padding: 10px 20px; background: #f3f4f6; color: #6b7280; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                            🗑️ Annuler
+                        </button>
+                    </form>
+                </div>
+            </div>
+            }
+        </div>
+    }
+    </div>
+
+    <!-- MODAL PROGRAMMER ENTRETIEN -->
+    <div id="programmerModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 20px; padding: 32px; max-width: 500px; width: 90%;">
+            <h3 style="font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 16px;">📅 Programmer un entretien</h3>
+            <p id="candidatName" style="color: #6b7280; margin-bottom: 24px;"></p>
+
+            <form id="programmerForm" method="post" asp-action="Programmer">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="candidatId" name="candidatId" />
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">Date et heure</label>
+                    <input type="datetime-local" name="dateEntretien" required style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px;" />
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">Type d'entretien</label>
+                    <select name="typeEntretien" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px;">
+                        <option value="RH">RH</option>
+                        <option value="Technique">Technique</option>
+                        <option value="Final">Final</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">Lieu</label>
+                    <select name="lieu" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px;">
+                        <option value="Bureau">Bureau</option>
+                        <option value="Visio">Visioconférence</option>
+                        <option value="Téléphone">Téléphone</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="button" onclick="closeProgrammerModal()" style="padding: 12px 24px; background: #f3f4f6; color: #374151; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                        Annuler
+                    </button>
+                    <button type="submit" style="padding: 12px 24px; background: #10b981; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                        Programmer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL REJETER -->
+    <div id="rejectModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 20px; padding: 32px; max-width: 500px; width: 90%;">
+            <h3 style="font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 16px;">❌ Rejeter le candidat</h3>
+
+            <form id="rejectForm" method="post" asp-action="Rejeter">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="rejectEntretienId" name="entretienId" />
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">Commentaire</label>
+                    <textarea name="commentaire" rows="4" placeholder="Raison du rejet..." style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-family: inherit;"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="button" onclick="closeRejectModal()" style="padding: 12px 24px; background: #f3f4f6; color: #374151; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                        Annuler
+                    </button>
+                    <button type="submit" style="padding: 12px 24px; background: #ef4444; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                        Confirmer le rejet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showProgrammerModal(candidatId, prenom, nom) {
+            document.getElementById('candidatId').value = candidatId;
+            document.getElementById('candidatName').textContent = `Candidat: ${prenom} ${nom}`;
+            document.getElementById('programmerModal').style.display = 'flex';
+        }
+
+        function closeProgrammerModal() {
+            document.getElementById('programmerModal').style.display = 'none';
+        }
+
+        function showRejectModal(entretienId) {
+            document.getElementById('rejectEntretienId').value = entretienId;
+            document.getElementById('rejectModal').style.display = 'flex';
+        }
+
+        function closeRejectModal() {
+            document.getElementById('rejectModal').style.display = 'none';
+        }
+    </script>

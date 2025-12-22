@@ -1,81 +1,145 @@
 @model IEnumerable<WebApplication1.Models.Candidat>
-
-@{
+    @{
     ViewData["Title"] = "Candidats";
-    Layout = "_LayoutDashboard";
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    }
+
+    <div class="page-header mb-4">
+        <div>
+            <h1 style="font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 0.5rem;">Candidats</h1>
+            <p style="color: #6b7280; font-size: 1rem;">Gérez l'ensemble des candidats inscrits sur la plateforme.</p>
+        </div>
+        <a href="@Url.Action("Create")" style="padding: 12px 24px; background: #10b981; color: white; border-radius: 10px; text-decoration: none; font-weight: 600;">
+            + Ajouter un candidat
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+{
+    <div style="background: #d1fae5; border: 1px solid #10b981; padding: 14px 18px; border-radius: 12px; margin-bottom: 24px; color: #065f46; font-weight: 500;">
+        @TempData["Success"]
+    </div>
 }
 
-<!-- En-tête de page -->
-<div class="page-header mb-4 d-flex justify-content-between align-items-center">
-    <div>
-        <h1 class="page-title">Candidats</h1>
-        <p class="page-subtitle">
-            Gérez l’ensemble des candidats inscrits sur la plateforme.
-        </p>
-    </div>
-
-    <a asp-action="Create" class="btn btn-success">
-        + Ajouter un candidat
-    </a>
-</div>
-
-<!-- Carte liste -->
-<div class="card">
-    <div class="card-body">
-
-        @if (!Model.Any())
-        {
-            <div class="text-center text-muted py-5">
-                Aucun candidat n’a encore été ajouté.
-            </div>
-        }
-        else
-        {
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Nom</th>
-                            <th>Prénom</th>
-                            <th>Email</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>@item.Nom</td>
-                                <td>@item.Prenom</td>
-                                <td>@item.Email</td>
-
-                                <td class="text-end">
-                                    <div class="d-inline-flex gap-2">
-                                        <a asp-action="Details"
-                                           asp-route-id="@item.Id"
-                                           class="btn btn-info btn-sm text-white">
-                                            👁 Voir
-                                        </a>
-
-                                        <a asp-action="Edit"
-                                           asp-route-id="@item.Id"
-                                           class="btn btn-warning btn-sm text-dark">
-                                            ✏️ Modifier
-                                        </a>
-
-                                        <a asp-action="Delete"
-                                           asp-route-id="@item.Id"
-                                           class="btn btn-danger btn-sm">
-                                            🗑 Supprimer
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+    <!-- STATISTIQUES RAPIDES -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        @{
+        var total = Model.Count();
+        var enAttente = Model.Count(c => c.Statut == "CV en attente");
+        var eligible = Model.Count(c => c.Statut == "Éligible aux tests");
+        var reussi = Model.Count(c => c.Statut == "Réussi aux tests");
+        var entretien = Model.Count(c => c.Statut == "Entretien programmé");
         }
 
+        <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="font-size: 2rem; font-weight: 700; color: #111827;">@total</div>
+            <div style="color: #6b7280; font-size: 0.9rem;">Total candidats</div>
+        </div>
+
+        <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="font-size: 2rem; font-weight: 700; color: #f59e0b;">@enAttente</div>
+            <div style="color: #6b7280; font-size: 0.9rem;">En attente</div>
+        </div>
+
+        <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="font-size: 2rem; font-weight: 700; color: #3b82f6;">@eligible</div>
+            <div style="color: #6b7280; font-size: 0.9rem;">Éligibles aux tests</div>
+        </div>
+
+        <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="font-size: 2rem; font-weight: 700; color: #10b981;">@reussi</div>
+            <div style="color: #6b7280; font-size: 0.9rem;">Réussi aux tests</div>
+        </div>
     </div>
-</div>
+
+    <!-- TABLEAU DES CANDIDATS -->
+    <div style="background: white; border-radius: 16px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #e5e7eb;">
+                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #6b7280; font-size: 0.85rem;">CANDIDAT</th>
+                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #6b7280; font-size: 0.85rem;">EMAIL</th>
+                    <th style="padding: 12px; text-align: center; font-weight: 600; color: #6b7280; font-size: 0.85rem;">SCORE GLOBAL</th>
+                    <th style="padding: 12px; text-align: center; font-weight: 600; color: #6b7280; font-size: 0.85rem;">STATUT</th>
+                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #6b7280; font-size: 0.85rem;">ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 60px; color: #6b7280;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">📭</div>
+                        <p>Aucun candidat pour l'instant.</p>
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var candidat in Model)
+                {
+                    var initiales = $"{(candidat.Prenom?.Length > 0 ? candidat.Prenom[0].ToString() : "")}{(candidat.Nom?.Length > 0 ? candidat.Nom[0].ToString() : "")}";
+
+                    var statutStyle = candidat.Statut switch
+                    {
+                        "CV en attente" => "background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid #f59e0b;",
+                        "Éligible aux tests" => "background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid #3b82f6;",
+                        "Réussi aux tests" => "background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid #10b981;",
+                        "Échec aux tests" => "background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444;",
+                        "Entretien programmé" => "background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid #8b5cf6;",
+                        "Embauché" => "background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid #22c55e;",
+                        "Rejeté" => "background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444;",
+                        _ => "background: rgba(107, 114, 128, 0.1); color: #6b7280; border: 1px solid #6b7280;"
+                    };
+
+                <tr style="border-bottom: 1px solid #f3f4f6;">
+                    <td style="padding: 16px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #14b8a6); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.9rem;">
+                                @initiales.ToUpper()
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: #111827;">@candidat.Prenom @candidat.Nom</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="padding: 16px; color: #6b7280;">
+                        @candidat.Email
+                    </td>
+                    <td style="padding: 16px; text-align: center;">
+                        @if (candidat.ScoreGlobal.HasValue)
+                            {
+                                var scoreClass = candidat.ScoreGlobal >= 60 ? "color: #10b981;" : "color: #ef4444;";
+                        <div style="font-size: 1.25rem; font-weight: 700; @scoreClass">
+                            @candidat.ScoreGlobal.Value.ToString("F1")%
+                        </div>
+                            }
+                            else
+                            {
+                        <span style="color: #9ca3af;">-</span>
+                            }
+                    </td>
+                    <td style="padding: 16px; text-align: center;">
+                        <span style="padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; @statutStyle">
+                            @candidat.Statut
+                        </span>
+                    </td>
+                    <td style="padding: 16px; text-align: right;">
+                        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                            <a href="@Url.Action("Details", new { id = candidat.Id })" style="padding: 8px 16px; background: #3b82f6; color: white; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 600;">
+                                Voir
+                            </a>
+                            <a href="@Url.Action("Edit", new { id = candidat.Id })" style="padding: 8px 16px; background: #f59e0b; color: white; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 600;">
+                                Modifier
+                            </a>
+                            <a href="@Url.Action("Delete", new { id = candidat.Id })" style="padding: 8px 16px; background: #ef4444; color: white; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 600;">
+                                Supprimer
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>

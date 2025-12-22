@@ -19,6 +19,8 @@ namespace WebApplication1.Data
         public DbSet<Question> Questions { get; set; }
         public DbSet<OptionReponse> OptionsReponse { get; set; }
         public DbSet<ReponseCandidat> ReponsesCandidats { get; set; }
+        public DbSet<Entretien> Entretiens { get; set; }
+
 
         // 🔥 IMPORTANT: Intégrer le seeder
         protected override void OnModelCreating(ModelBuilder modelBuilder)

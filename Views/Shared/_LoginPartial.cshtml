@@ -1,52 +1,29 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@using Microsoft.EntityFrameworkCore
-@using WebApplication1.Data
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
-@inject ApplicationDbContext Context
 
-@{
-    string displayName = "Utilisateur";
-    
-    if (SignInManager.IsSignedIn(User))
-    {
-        var userId = UserManager.GetUserId(User);
-        var candidat = await Context.Candidats.FirstOrDefaultAsync(c => c.UserId == userId);
-        
-        if (candidat != null)
-        {
-            displayName = $"{candidat.Prenom} {candidat.Nom}";
-        }
-        else
-        {
-            // Fallback to email if no Candidat found
-            var user = await UserManager.GetUserAsync(User);
-            displayName = user?.Email ?? "Utilisateur";
-        }
-    }
-}
-
-<ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
+        <ul class="navbar-nav">
+            @if (SignInManager.IsSignedIn(User))
 {
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Dashboard" asp-action="Index" title="Dashboard">
-            Bonjour @displayName !
-        </a>
-    </li>
-    <li class="nav-item">
-        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button type="submit" class="nav-link btn btn-link text-dark">Déconnexion</button>
-        </form>
-    </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Dashboard" asp-action="Index" title="Dashboard">
+                    Bonjour @User.Identity.Name !
+                </a>
+            </li>
+            <li class="nav-item">
+                <form class="form-inline" method="post" asp-area="" asp-controller="Compte" asp-action="Logout">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="nav-link btn btn-link text-dark">Déconnexion</button>
+                </form>
+            </li>
 }
 else
 {
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">S'inscrire</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Se connecter</a>
-    </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">S'inscrire</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Se connecter</a>
+            </li>
 }
-</ul>
+        </ul>

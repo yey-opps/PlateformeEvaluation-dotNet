@@ -10,6 +10,7 @@
 
 @{
 var totalCandidats = Context.Candidats.Count();
+var totalCandidatures = Context.Candidatures.Count(c => c.Statut == "En attente");
 }
 
 @{
@@ -69,35 +70,41 @@ if (SignInManager.IsSignedIn(User))
             </div>
 
             <nav class="sidebar-nav">
-                <a href="@Url.Action("Index", "Dashboard")" class="nav-link active">
+                <a href="@Url.Action("Index", "Dashboard")" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")">
                     <span class="nav-icon">📊</span>
                     <span class="nav-text">Tableau de bord</span>
                 </a>
 
-                <a href="@Url.Action("Index", "Candidats")" class="nav-link">
+                <a href="@Url.Action("Index", "Candidatures")" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Candidatures" ? "active" : "")">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">Candidatures</span>
+                    @if (totalCandidatures > 0)
+                    {
+                    <span class="nav-badge">@totalCandidatures</span>
+                    }
+                </a>
+
+                <a href="@Url.Action("Index", "Candidats")" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Candidats" ? "active" : "")">
                     <span class="nav-icon">👥</span>
                     <span class="nav-text">Candidats</span>
                     <span class="nav-badge">@totalCandidats</span>
                 </a>
 
-                <a href="@Url.Action("Index", "Evaluations")" class="nav-link">
+                <a href="@Url.Action("Index", "Evaluations")" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Evaluations" ? "active" : "")">
                     <span class="nav-icon">📝</span>
                     <span class="nav-text">Évaluations</span>
                     <span class="nav-badge">8</span>
                 </a>
 
-                <a href="#" class="nav-link">
-                    <span class="nav-icon">💼</span>
-                    <span class="nav-text">Offres d'emploi</span>
-                </a>
 
-                <a href="#" class="nav-link">
+
+                <a href="@Url.Action("Index", "Entretiens")" class="nav-link">
                     <span class="nav-icon">📅</span>
                     <span class="nav-text">Entretiens</span>
                     <span class="nav-badge">3</span>
                 </a>
 
-                <a href="#" class="nav-link">
+                <a href="@Url.Action("Index", "Statistiques")" class="nav-link">
                     <span class="nav-icon">📊</span>
                     <span class="nav-text">Statistiques</span>
                 </a>

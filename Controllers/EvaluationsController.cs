@@ -261,12 +261,37 @@ public async Task<IActionResult> Submit(PasserEvaluationViewModel model)
             ReponseTexte = q.SelectedOptionId?.ToString() ?? ""
         };
         _context.ReponsesCandidats.Add(reponse);
+
     }
 
     await _context.SaveChangesAsync();
+            // ============ MISE À JOUR DU STATUT CANDIDAT ============
+            // Récupérer toutes les tentatives du candidat
+            var toutesTentatives = await _context.Tentatives
+                .Where(t => t.CandidatId == candidat.Id)
+                .ToListAsync();
 
-    // ✅ FIX: Store everything as STRINGS or basic types only
-    TempData["Score"] = correctAnswers.ToString();
+            // Calculer le score global (moyenne de toutes les tentatives)
+            if (toutesTentatives.Any())
+            {
+                float scoreGlobal = toutesTentatives.Average(t => t.Score);
+                candidat.ScoreGlobal = scoreGlobal;
+
+                // Mettre à jour le statut selon le score
+                if (scoreGlobal >= 60)
+                {
+                    candidat.Statut = "Réussi aux tests";
+                }
+                else
+                {
+                    candidat.Statut = "Échec aux tests";
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            // ✅ FIX: Store everything as STRINGS or basic types only
+            TempData["Score"] = correctAnswers.ToString();
     TempData["Total"] = totalQuestions.ToString();
     TempData["Percentage"] = scorePercentage.ToString("F1"); // ✅ Convert to string
     TempData["EvaluationTitle"] = model.Titre;

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
+using WebApplication1.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,8 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 
 // MVC + Razor
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 builder.Services.AddRazorPages();
 
 // 🔹 BUILD APP (OBLIGATOIRE AVANT d’utiliser app)
